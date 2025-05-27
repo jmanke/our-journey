@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import L from "leaflet";
 import { onMounted, useTemplateRef } from "vue";
+import { getImages } from "../utils/cloudinary";
 
 const mapContainer = useTemplateRef("map-container");
 
@@ -22,6 +23,7 @@ function createMap() {
 }
 
 onMounted(() => {
+  getImages("travel");
   createMap();
 });
 </script>
@@ -30,7 +32,7 @@ onMounted(() => {
 
 <style scoped>
 .map-container {
-  height: 360px;
-  width: 360px;
+  height: 100vh;
+  width: 100vw;
 }
 </style>
