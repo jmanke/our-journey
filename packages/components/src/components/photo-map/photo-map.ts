@@ -22,6 +22,10 @@ interface PhotoMarker {
    * The count indicator element for overlapping markers.
    */
   countIndicator: HTMLDivElement;
+  /**
+   * Photo markers that are hidden by this marker due to overlap.
+   */
+  hiddenPhotoMarkers: PhotoMarker[];
 }
 
 @customElement("journey-photo-map")
@@ -49,7 +53,6 @@ export class PhotoMap extends LitElement {
 
     // create marker element
     const container = document.createElement("div");
-    container.classList.add("thumbnail");
     const countIndicator = document.createElement("div");
     countIndicator.classList.add("count-indicator");
     container.appendChild(countIndicator);
@@ -66,12 +69,19 @@ export class PhotoMap extends LitElement {
     })
       .setLngLat([long, lat])
       .addTo(this.map);
+    marker.addClassName("photo-marker");
 
-    return {
+    const photoMarker = {
       marker,
       element: container,
       countIndicator,
+      hiddenPhotoMarkers: [],
     };
+    container.addEventListener("click", () => {
+      console.log("Marker clicked", photoMarker);
+    });
+
+    return photoMarker;
   }
 
   visiblePhotoMarkers(): PhotoMarker[] {
@@ -114,7 +124,9 @@ export class PhotoMap extends LitElement {
       }
 
       photoMarker.marker.setOpacity("1");
+      photoMarker.marker.addClassName("visible");
       const markerRect = photoMarker.element.getBoundingClientRect();
+      photoMarker.hiddenPhotoMarkers = [];
 
       const remainingPhotoMarkers: PhotoMarker[] = [];
       for (const otherPhotoMarker of photoMarkers) {
@@ -127,6 +139,8 @@ export class PhotoMap extends LitElement {
           markerRect.top <= otherRect.bottom
         ) {
           otherPhotoMarker.marker.setOpacity("0");
+          otherPhotoMarker.marker.removeClassName("visible");
+          photoMarker.hiddenPhotoMarkers.push(otherPhotoMarker);
         } else {
           remainingPhotoMarkers.push(otherPhotoMarker);
         }

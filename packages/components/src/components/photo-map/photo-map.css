@@ -12,12 +12,18 @@ details.maplibregl-ctrl {
   display: none !important;
 }
 
-.thumbnail {
+.photo-marker {
   position: relative;
   border-radius: 15%;
   border: 2px solid white;
   width: var(--journey-map-marker-size);
   height: var(--journey-map-marker-size);
+  cursor: pointer;
+  pointer-events: none;
+
+  &.visible {
+    pointer-events: auto;
+  }
 
   .count-indicator {
     position: absolute;
