@@ -134,7 +134,7 @@ export class PhotoMap extends LitElement {
 
       const photoCount = photoMarkers.length - remainingPhotoMarkers.length + 1;
       photoMarker.countIndicator.textContent =
-        photoCount > 1 ? photoCount.toString() : null;
+        photoCount > 1 ? photoCount.toLocaleString() : null;
 
       photoMarkers = remainingPhotoMarkers;
     }
