@@ -7,8 +7,49 @@
     <title>Our Journey</title>
     <link rel="stylesheet" href="./src/index.css" />
     <script type="module" src="/src/components/photo-map/photo-map.ts"></script>
+    <script
+      type="module"
+      src="/src/components/photo-gallery/photo-gallery.ts"
+    ></script>
+    <script
+      type="module"
+      src="/src/components/photo-gallery-item/photo-gallery-item.ts"
+    ></script>
+    <script
+      type="module"
+      src="/src/components/close-button/close-button.ts"
+    ></script>
   </head>
   <body>
-    <journey-photo-map></journey-photo-map>
+    <journey-photo-map>
+      <journey-photo-gallery closed>
+        <journey-photo-gallery-item src="thumbnails/IMG_4285_thumbnail.jpg">
+        </journey-photo-gallery-item>
+        <journey-photo-gallery-item src="thumbnails/IMG_4285_thumbnail.jpg">
+        </journey-photo-gallery-item>
+        <journey-photo-gallery-item src="thumbnails/IMG_4285_thumbnail.jpg">
+        </journey-photo-gallery-item>
+      </journey-photo-gallery>
+    </journey-photo-map>
   </body>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const photoGallery = document.querySelector("journey-photo-gallery");
+      const photoMap = document.querySelector("journey-photo-map");
+      photoMap?.addEventListener("journeyPhotoMarkerClick", (event) => {
+        photoGallery.closed = false;
+        while (photoGallery.firstElementChild) {
+          photoGallery.firstElementChild.remove();
+        }
+        console.log(event.detail.photos);
+        event.detail.photos.forEach(photo => {
+          const item = document.createElement("journey-photo-gallery-item");
+          item.src = photo.src;
+          photoGallery.appendChild(item);
+        });
+      });
+    });
+  </script>
+</body>
 </html>

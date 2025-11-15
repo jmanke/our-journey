@@ -1,20 +1,40 @@
 :host {
+  display: block;
   --journey-map-marker-size: 75px;
   --journey-map-marker-indicator-size: 10px;
 }
 
 .container {
-  width: 100%;
-  height: 50vh;
-}
+  position: relative;
 
-details.maplibregl-ctrl {
-  display: none !important;
+  .map {
+    width: 100%;
+    height: 50vh;
+
+    details.maplibregl-ctrl {
+      display: none !important;
+    }
+  }
+
+  .content {
+    position: absolute;
+    display: block;
+    top: var(--spacing-4);
+    left: var(--spacing-4);
+    right: var(--spacing-4);
+    bottom: var(--spacing-4);
+    pointer-events: none;
+
+    ::slotted(journey-photo-gallery) {
+      pointer-events: all;
+      max-height: 100%;
+    }
+  }
 }
 
 .photo-marker {
   position: relative;
-  border-radius: 15%;
+  border-radius: var(--border-radius-1);
   border: 2px solid white;
   width: var(--journey-map-marker-size);
   height: var(--journey-map-marker-size);
@@ -26,6 +46,8 @@ details.maplibregl-ctrl {
   }
 
   .count-indicator {
+    text-shadow: rgb(0, 0, 0) 1px 1px 1px;
+    font-size: 14px;
     position: absolute;
     bottom: 0;
     left: 5px;
@@ -33,7 +55,7 @@ details.maplibregl-ctrl {
   }
 
   img {
-    border-radius: 15%;
+    border-radius: var(--border-radius-1);
   }
 
   &::after {

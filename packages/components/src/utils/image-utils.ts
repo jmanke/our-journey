@@ -1,15 +1,15 @@
-import { parse } from "exifr";
+import { gps } from "exifr";
 
 export type LongLat = [number, number];
 
 export async function readLongLatFromJpg(file: File | Blob): Promise<LongLat> {
-  const exifData = await parse(file);
+  const gpsData = await gps(file);
   if (
-    typeof exifData?.latitude !== "number" ||
-    typeof exifData?.longitude !== "number"
+    typeof gpsData?.latitude !== "number" ||
+    typeof gpsData?.longitude !== "number"
   ) {
     throw new Error("No GPS data found in EXIF metadata.");
   }
 
-  return [exifData.longitude, exifData.latitude];
+  return [gpsData.longitude, gpsData.latitude];
 }

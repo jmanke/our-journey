@@ -1,6 +1,7 @@
 const sharp = require("sharp");
 const fs = require("fs");
 const path = require("path");
+const exifr = require("exifr");
 
 async function cropCenterSquare(inputPath, outputPath, size = 200) {
   const image = sharp(inputPath);
@@ -22,13 +23,35 @@ if (fs.existsSync("./output") === false) {
   fs.mkdirSync("./output");
 }
 
-fs.readdirSync("./images").forEach((file) => {
-  console.log(file);
-  const outputFileName = path.parse(file).name;
-  const extension = path.parse(file).ext;
-  cropCenterSquare(
-    `./images/${file}`,
-    `./output/${outputFileName}_thumbnail${extension}`,
-    250
-  );
-});
+async function processImagesAndWriteList() {
+  const outputFiles = [];
+  const files = fs.readdirSync("./images");
+  for (const file of files) {
+    const inputPath = `./images/${file}`;
+    try {
+      const exif = await exifr.gps(inputPath);
+      if (exif && exif.latitude != null && exif.longitude != null) {
+        console.log(`${file}: has GPS (${exif.latitude}, ${exif.longitude})`);
+        const outputFileName = path.parse(file).name;
+        const extension = path.parse(file).ext;
+        const outputPath = `./output/${outputFileName}_thumbnail${extension}`;
+        outputFiles.push(`${outputFileName}_thumbnail${extension}`);
+        await cropCenterSquare(
+          inputPath,
+          outputPath,
+          250
+        );
+      } else {
+        console.log(`${file}: skipped (no GPS data)`);
+      }
+    } catch (err) {
+      console.error(`${file}: error reading EXIF`, err);
+    }
+  }
+  // Write the output file names to a JS file as an array
+  const jsArray = `// Auto-generated list of output photo thumbnails\nmodule.exports = [\n${outputFiles.map(f => `  \"${f}\"`).join(",\n")}\n];\n`;
+  fs.writeFileSync("./output/photo-thumbnails.js", jsArray);
+  console.log("Wrote ./output/photo-thumbnails.js with", outputFiles.length, "entries");
+}
+
+processImagesAndWriteList();

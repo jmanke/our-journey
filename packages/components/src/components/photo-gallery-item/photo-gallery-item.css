@@ -1,0 +1,4 @@
+img {
+  border-radius: var(--spacing-2);
+  cursor: pointer;
+}

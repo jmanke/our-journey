@@ -1,0 +1,34 @@
+:host {
+  --close-button-size: 16px;
+}
+
+.x {
+  display: inline-block;
+  position: relative;
+  width: var(--close-button-size);
+  height: var(--close-button-size);
+  border: 1px solid white;
+  border-radius: 100%;
+  padding: 1px;
+  cursor: pointer;
+}
+
+.x::before,
+.x::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--close-button-size) / 2);
+  top: 1px;
+  width: 2px;
+  height: var(--close-button-size);
+  border-radius: 1px;
+  background: white;
+}
+
+.x::before {
+  transform: rotate(45deg);
+}
+
+.x::after {
+  transform: rotate(-45deg);
+}

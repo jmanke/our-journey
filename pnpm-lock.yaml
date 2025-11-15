@@ -97,6 +97,9 @@ importers:
 
   packages/photos:
     dependencies:
+      exifr:
+        specifier: ^7.1.3
+        version: 7.1.3
       sharp:
         specifier: ^0.34.5
         version: 0.34.5

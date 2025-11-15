@@ -11,6 +11,10 @@ import { readLongLatFromJpg } from "../../utils/image-utils";
  */
 interface PhotoMarker {
   /**
+   * The source URL of the photo.
+   */
+  src: string;
+  /**
    * The map marker.
    */
   marker: Marker;
@@ -33,7 +37,7 @@ export class PhotoMap extends LitElement {
   static styles = [unsafeCSS(styles), unsafeCSS(mapLibreStyles)];
 
   map?: Map;
-  mapContainer?: HTMLElement;
+  mapRef?: HTMLElement;
   photoMarkers: PhotoMarker[] = [];
 
   //#region Private methods
@@ -52,18 +56,18 @@ export class PhotoMap extends LitElement {
     const [long, lat] = await readLongLatFromJpg(blob);
 
     // create marker element
-    const container = document.createElement("div");
+    const map = document.createElement("div");
     const countIndicator = document.createElement("div");
     countIndicator.classList.add("count-indicator");
-    container.appendChild(countIndicator);
+    map.appendChild(countIndicator);
     const img = document.createElement("img");
     img.src = src;
     img.width = markerSize;
     img.height = markerSize;
-    container.appendChild(img);
+    map.appendChild(img);
 
     const marker = new Marker({
-      element: container,
+      element: map,
       anchor: "bottom",
       offset: [0, -markerIndicatorSize],
     })
@@ -72,13 +76,20 @@ export class PhotoMap extends LitElement {
     marker.addClassName("photo-marker");
 
     const photoMarker = {
+      src,
       marker,
-      element: container,
+      element: map,
       countIndicator,
       hiddenPhotoMarkers: [],
     };
-    container.addEventListener("click", () => {
-      console.log("Marker clicked", photoMarker);
+    map.addEventListener("click", () => {
+      this.dispatchEvent(
+        new CustomEvent("journeyPhotoMarkerClick", {
+          detail: { photos: [photoMarker, ...photoMarker.hiddenPhotoMarkers] },
+          bubbles: true,
+          composed: true,
+        })
+      );
     });
 
     return photoMarker;
@@ -89,7 +100,7 @@ export class PhotoMap extends LitElement {
       return [];
     }
 
-    const mapRect = this.mapContainer?.getBoundingClientRect();
+    const mapRect = this.mapRef?.getBoundingClientRect();
     if (!mapRect) {
       return [];
     }
@@ -159,14 +170,14 @@ export class PhotoMap extends LitElement {
   //#region Lifecycle
 
   async firstUpdated(): Promise<void> {
-    const mapContainer = this.shadowRoot?.querySelector(".container");
-    if (!(mapContainer instanceof HTMLElement)) {
+    const mapRef = this.shadowRoot?.querySelector(".map");
+    if (!(mapRef instanceof HTMLElement)) {
       return;
     }
-    this.mapContainer = mapContainer;
+    this.mapRef = mapRef;
 
     this.map = new Map({
-      container: mapContainer,
+      container: mapRef,
       style: "https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json",
       center: [-74.006, 40.7128],
       zoom: 6,
@@ -185,14 +196,149 @@ export class PhotoMap extends LitElement {
     this.photoMarkers = (
       await Promise.allSettled(
         [
-          "thumbnails/IMG_4285_thumbnail.jpg",
-          "thumbnails/IMG_4296_thumbnail.JPG",
-          "thumbnails/IMG_4506_thumbnail.jpg",
-          "thumbnails/IMG_4733_thumbnail.jpg",
-          "thumbnails/IMG_5084_thumbnail.jpg",
-          "thumbnails/test_thumbnail.jpg",
+          "IMG_3193_thumbnail.jpg",
+          "IMG_3198_thumbnail.jpg",
+          "IMG_3203_thumbnail.jpg",
+          "IMG_3227_thumbnail.jpg",
+          "IMG_3230_thumbnail.jpg",
+          "IMG_3236_thumbnail.jpg",
+          "IMG_3323_thumbnail.jpg",
+          "IMG_3335_thumbnail.jpg",
+          "IMG_3357_thumbnail.jpg",
+          "IMG_3362_thumbnail.jpg",
+          "IMG_3376_thumbnail.jpg",
+          "IMG_3383_thumbnail.jpg",
+          "IMG_3385_thumbnail.jpg",
+          "IMG_3403_thumbnail.jpg",
+          "IMG_3410_thumbnail.jpg",
+          "IMG_3412_thumbnail.jpg",
+          "IMG_3417_thumbnail.jpg",
+          "IMG_3564_thumbnail.jpg",
+          "IMG_3573_thumbnail.jpg",
+          "IMG_3620_thumbnail.jpg",
+          "IMG_3635_thumbnail.jpg",
+          "IMG_3653 2_thumbnail.jpg",
+          "IMG_3654_thumbnail.jpg",
+          "IMG_3660_thumbnail.jpg",
+          "IMG_3675 2_thumbnail.jpg",
+          "IMG_3675_thumbnail.jpg",
+          "IMG_3683_thumbnail.jpg",
+          "IMG_3736_thumbnail.jpg",
+          "IMG_3738_thumbnail.jpg",
+          "IMG_3918_thumbnail.jpg",
+          "IMG_3937_thumbnail.jpg",
+          "IMG_3941_thumbnail.jpg",
+          "IMG_3977_thumbnail.jpg",
+          "IMG_4094_thumbnail.jpg",
+          "IMG_4110_thumbnail.jpg",
+          "IMG_4165_thumbnail.jpg",
+          "IMG_4283_thumbnail.jpg",
+          "IMG_4310_thumbnail.jpg",
+          "IMG_4353_thumbnail.jpg",
+          "IMG_4360_thumbnail.jpg",
+          "IMG_4377_thumbnail.jpg",
+          "IMG_4384_thumbnail.jpg",
+          "IMG_4440_thumbnail.jpg",
+          "IMG_4476_thumbnail.jpg",
+          "IMG_4506_thumbnail.jpg",
+          "IMG_4529_thumbnail.jpg",
+          "IMG_4543_thumbnail.jpg",
+          "IMG_4548_thumbnail.jpg",
+          "IMG_4603_thumbnail.jpg",
+          "IMG_4611_thumbnail.jpg",
+          "IMG_4617_thumbnail.jpg",
+          "IMG_4643_thumbnail.jpg",
+          "IMG_4680_thumbnail.jpg",
+          "IMG_4681_thumbnail.jpg",
+          "IMG_4733_thumbnail.jpg",
+          "IMG_4741_thumbnail.jpg",
+          "IMG_4760_thumbnail.jpg",
+          "IMG_4825_thumbnail.jpg",
+          "IMG_4993_thumbnail.jpg",
+          "IMG_5004_thumbnail.jpg",
+          "IMG_5014_thumbnail.jpg",
+          "IMG_5029_thumbnail.jpg",
+          "IMG_5033_thumbnail.jpg",
+          "IMG_5062_thumbnail.jpg",
+          "IMG_5101_thumbnail.jpg",
+          "IMG_5111_thumbnail.jpg",
+          "IMG_5122_thumbnail.jpg",
+          "IMG_5169_thumbnail.jpg",
+          "IMG_5177_thumbnail.jpg",
+          "IMG_5193_thumbnail.jpg",
+          "IMG_5202_thumbnail.jpg",
+          "IMG_5237_thumbnail.jpg",
+          "IMG_5364 2_thumbnail.jpg",
+          "IMG_5403_thumbnail.jpg",
+          "IMG_5427_thumbnail.jpg",
+          "IMG_5477_thumbnail.jpg",
+          "IMG_5500_thumbnail.jpg",
+          "IMG_5516_thumbnail.jpg",
+          "IMG_5619_thumbnail.jpg",
+          "IMG_5680_thumbnail.jpg",
+          "IMG_5750_thumbnail.jpg",
+          "IMG_5751 2_thumbnail.jpg",
+          "IMG_5760_thumbnail.jpg",
+          "IMG_5768 2_thumbnail.jpg",
+          "IMG_5972_thumbnail.jpg",
+          "IMG_6025_thumbnail.jpg",
+          "IMG_6028_thumbnail.jpg",
+          "IMG_6040_thumbnail.jpg",
+          "IMG_6128_thumbnail.jpg",
+          "IMG_6155_thumbnail.jpg",
+          "IMG_6157_thumbnail.jpg",
+          "IMG_6175_thumbnail.jpg",
+          "IMG_6220_thumbnail.jpg",
+          "IMG_6251_thumbnail.jpg",
+          "IMG_6253 2_thumbnail.jpg",
+          "IMG_6259_thumbnail.jpg",
+          "IMG_6292_thumbnail.jpg",
+          "IMG_6317_thumbnail.jpg",
+          "IMG_6332_thumbnail.jpg",
+          "IMG_6349_thumbnail.jpg",
+          "IMG_6356_thumbnail.jpg",
+          "IMG_6442_thumbnail.jpg",
+          "IMG_6512_thumbnail.jpg",
+          "IMG_6655_thumbnail.jpg",
+          "IMG_6664_thumbnail.jpg",
+          "IMG_6674_thumbnail.jpg",
+          "IMG_6703_thumbnail.jpg",
+          "IMG_6709_thumbnail.jpg",
+          "IMG_6720_thumbnail.jpg",
+          "IMG_6725_thumbnail.jpg",
+          "IMG_6729_thumbnail.jpg",
+          "IMG_6756_thumbnail.jpg",
+          "IMG_6758_thumbnail.jpg",
+          "IMG_6798_thumbnail.jpg",
+          "IMG_6804_thumbnail.jpg",
+          "IMG_6805_thumbnail.jpg",
+          "IMG_6807 2_thumbnail.jpg",
+          "IMG_6824_thumbnail.jpg",
+          "IMG_6828_thumbnail.jpg",
+          "IMG_6829_thumbnail.jpg",
+          "IMG_6883_thumbnail.jpg",
+          "IMG_6962_thumbnail.jpg",
+          "IMG_7019_thumbnail.jpg",
+          "IMG_7042_thumbnail.jpg",
+          "IMG_7046_thumbnail.jpg",
+          "IMG_7150_thumbnail.jpg",
+          "IMG_7169_thumbnail.jpg",
+          "IMG_7185_thumbnail.jpg",
+          "IMG_7212_thumbnail.jpg",
+          "IMG_7300_thumbnail.jpg",
+          "IMG_7399_thumbnail.jpg",
+          "IMG_7406_thumbnail.jpg",
+          "IMG_7452_thumbnail.jpg",
+          "IMG_7468_thumbnail.jpg",
+          "IMG_7479_thumbnail.jpg",
+          "IMG_7552_thumbnail.jpg",
+          "IMG_7567_thumbnail.jpg",
         ].map((src) =>
-          this.createImgMarker(`/${src}`, markerSize, markerIndicatorSize)
+          this.createImgMarker(
+            `thumbnails/${src}`,
+            markerSize,
+            markerIndicatorSize
+          )
         )
       )
     )
@@ -207,7 +353,12 @@ export class PhotoMap extends LitElement {
   //#region Rendering
 
   render(): TemplateResult {
-    return html`<div class="container"></div>`;
+    return html` <div class="container">
+      <div class="map"></div>
+      <div class="content">
+        <slot> </slot>
+      </div>
+    </div>`;
   }
 
   //#endregion
