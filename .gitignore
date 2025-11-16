@@ -48,3 +48,9 @@ lerna-debug.log*
 .turbo/
 .cache/
 .cache/**
+
+#temp
+packages/components/public/photos/*
+packages/components/public/thumbnails/*
+packages/photos/images/*
+packages/photos/output/*
