@@ -9,7 +9,7 @@ export class CloseButton extends LitElement {
   //#region Rendering
 
   render(): TemplateResult {
-    return html`<div class="x"></div>`;
+    return html`<div></div>`;
   }
 
   //#endregion

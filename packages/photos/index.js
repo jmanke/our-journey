@@ -23,8 +23,29 @@ if (fs.existsSync("./output") === false) {
   fs.mkdirSync("./output");
 }
 
+async function deleteImagesWithoutGPS() {
+  const imagesDir = path.join(__dirname, "images");
+  const files = fs.readdirSync(imagesDir);
+  for (const file of files) {
+    const filePath = path.join(imagesDir, file);
+    try {
+      const exif = await exifr.gps(filePath);
+      if (!exif || exif.latitude == null || exif.longitude == null) {
+        fs.unlinkSync(filePath);
+        console.log(`Deleted: ${file}`);
+      } else {
+        console.log(`Kept: ${file}`);
+      }
+    } catch (err) {
+      console.error(`Error processing ${file}:`, err);
+    }
+  }
+}
+
 async function processImagesAndWriteList() {
-  const outputFiles = [];
+  await deleteImagesWithoutGPS();
+
+  const outputData = [];
   const files = fs.readdirSync("./images");
   for (const file of files) {
     const inputPath = `./images/${file}`;
@@ -35,12 +56,12 @@ async function processImagesAndWriteList() {
         const outputFileName = path.parse(file).name;
         const extension = path.parse(file).ext;
         const outputPath = `./output/${outputFileName}_thumbnail${extension}`;
-        outputFiles.push(`${outputFileName}_thumbnail${extension}`);
-        await cropCenterSquare(
-          inputPath,
-          outputPath,
-          250
-        );
+        outputData.push({
+          src: `photos/${file}`,
+          thumbnailSrc: `thumbnails/${outputFileName}_thumbnail${extension}`,
+          longLat: [exif.longitude, exif.latitude],
+        });
+        await cropCenterSquare(inputPath, outputPath, 250);
       } else {
         console.log(`${file}: skipped (no GPS data)`);
       }
@@ -49,9 +70,13 @@ async function processImagesAndWriteList() {
     }
   }
   // Write the output file names to a JS file as an array
-  const jsArray = `// Auto-generated list of output photo thumbnails\nmodule.exports = [\n${outputFiles.map(f => `  \"${f}\"`).join(",\n")}\n];\n`;
+  const jsArray = JSON.stringify(outputData, null, 2);
   fs.writeFileSync("./output/photo-thumbnails.js", jsArray);
-  console.log("Wrote ./output/photo-thumbnails.js with", outputFiles.length, "entries");
+  console.log(
+    "Wrote ./output/photo-thumbnails.js with",
+    outputData.length,
+    "entries"
+  );
 }
 
 processImagesAndWriteList();

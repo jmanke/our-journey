@@ -2,7 +2,7 @@
   --close-button-size: 16px;
 }
 
-.x {
+div {
   display: inline-block;
   position: relative;
   width: var(--close-button-size);
@@ -13,8 +13,8 @@
   cursor: pointer;
 }
 
-.x::before,
-.x::after {
+div::before,
+div::after {
   content: "";
   position: absolute;
   left: calc(var(--close-button-size) / 2);
@@ -25,10 +25,10 @@
   background: white;
 }
 
-.x::before {
+div::before {
   transform: rotate(45deg);
 }
 
-.x::after {
+div::after {
   transform: rotate(-45deg);
 }

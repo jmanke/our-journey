@@ -10,11 +10,11 @@ import { Map, Marker } from "maplibre-gl";
 import styles from "./photo-map.css?inline";
 
 import mapLibreStyles from "maplibre-gl/dist/maplibre-gl.css?inline";
-import { readLongLatFromJpg } from "../../utils/image-utils";
 
 export interface Photo {
   src: string;
   thumbnailSrc: string;
+  longLat: [number, number];
 }
 
 /**
@@ -37,6 +37,10 @@ export interface PhotoMarker {
    * The HTML element representing the marker.
    */
   element: HTMLDivElement;
+  /**
+   * The image element within the marker.
+   */
+  imgElement: HTMLImageElement;
   /**
    * The count indicator element for overlapping markers.
    */
@@ -81,27 +85,23 @@ export class PhotoMap extends LitElement {
       throw new Error("Map is not initialized");
     }
 
-    const response = await fetch(source.thumbnailSrc);
-    const blob = await response.blob();
-    const [long, lat] = await readLongLatFromJpg(blob);
-
     // create marker element
-    const container = document.createElement("div");
+    const element = document.createElement("div");
     const countIndicator = document.createElement("div");
     countIndicator.classList.add("count-indicator");
-    container.appendChild(countIndicator);
+    element.appendChild(countIndicator);
     const img = document.createElement("img");
-    img.src = source.thumbnailSrc;
     img.width = markerSize;
     img.height = markerSize;
-    container.appendChild(img);
+    element.appendChild(img);
 
     const marker = new Marker({
-      element: container,
+      element: element,
       anchor: "bottom",
       offset: [0, -markerIndicatorSize],
     })
-      .setLngLat([long, lat])
+      .setLngLat(source.longLat)
+      .setOpacity("0")
       .addTo(this.map);
     marker.addClassName("photo-marker");
 
@@ -109,11 +109,12 @@ export class PhotoMap extends LitElement {
       src: source.src,
       thumbnailSrc: source.thumbnailSrc,
       marker,
-      element: container,
+      element: element,
+      imgElement: img,
       countIndicator,
       hiddenPhotoMarkers: [],
     };
-    container.addEventListener("click", () => {
+    element.addEventListener("click", () => {
       if (!photoMarker.hiddenPhotoMarkers.length) {
         this.selectedPhotoMarker = photoMarker;
         return;
@@ -169,6 +170,7 @@ export class PhotoMap extends LitElement {
 
       photoMarker.marker.setOpacity("1");
       photoMarker.marker.addClassName("visible");
+      photoMarker.imgElement.src = photoMarker.thumbnailSrc;
       const markerRect = photoMarker.element.getBoundingClientRect();
       photoMarker.hiddenPhotoMarkers = [];
 
