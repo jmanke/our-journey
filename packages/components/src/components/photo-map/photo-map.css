@@ -82,7 +82,8 @@
   max-height: 80vh;
   border-radius: 5%;
   opacity: 0;
-  animation: selected-photo-fade-in 0.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: selected-photo-fade-in var(--animation-time-fast)
+    cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes selected-photo-fade-in {

@@ -9,4 +9,6 @@
   --spacing-8: 2rem;
 
   --border-radius-1: var(--spacing-4);
+
+  --animation-time-fast: 0.15s;
 }
