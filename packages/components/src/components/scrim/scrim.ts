@@ -1,18 +1,14 @@
 import { LitElement, html, unsafeCSS, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import styles from "./photo-gallery.css?inline";
+import styles from "./scrim.css?inline";
 
-@customElement("journey-photo-gallery")
-export class PhotoGallery extends LitElement {
+@customElement("journey-scrim")
+export class Scrim extends LitElement {
   static styles = [unsafeCSS(styles)];
 
   //#region Properties
 
-  @property({ reflect: true, type: Boolean }) closed = false;
-
-  //#endregion
-
-  //#region State
+  @property({ reflect: true }) closed?: boolean;
 
   //#endregion
 
@@ -37,16 +33,7 @@ export class PhotoGallery extends LitElement {
   //#region Rendering
 
   render(): TemplateResult {
-    return html`
-      <journey-panel
-        .closed=${this.closed}
-        @journey-panel-closed=${() => this.close()}
-      >
-        <div class="photo-gallery">
-          <slot></slot>
-        </div>
-      </journey-panel>
-    `;
+    return html`<div @click=${() => this.close()}></div>`;
   }
 
   //#endregion

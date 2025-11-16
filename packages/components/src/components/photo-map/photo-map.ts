@@ -1,19 +1,34 @@
-import { LitElement, html, unsafeCSS, type TemplateResult } from "lit";
-import { customElement } from "lit/decorators.js";
+import {
+  LitElement,
+  html,
+  unsafeCSS,
+  type PropertyValues,
+  type TemplateResult,
+} from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 import { Map, Marker } from "maplibre-gl";
 import styles from "./photo-map.css?inline";
 
 import mapLibreStyles from "maplibre-gl/dist/maplibre-gl.css?inline";
 import { readLongLatFromJpg } from "../../utils/image-utils";
 
+export interface Photo {
+  src: string;
+  thumbnailSrc: string;
+}
+
 /**
  * Represents a photo marker on the map.
  */
-interface PhotoMarker {
+export interface PhotoMarker {
   /**
    * The source URL of the photo.
    */
   src: string;
+  /**
+   * The thumbnail source URL of the photo.
+   */
+  thumbnailSrc: string;
   /**
    * The map marker.
    */
@@ -36,14 +51,29 @@ interface PhotoMarker {
 export class PhotoMap extends LitElement {
   static styles = [unsafeCSS(styles), unsafeCSS(mapLibreStyles)];
 
-  map?: Map;
+  //#region Properties
+
+  @property() sources?: Photo[];
+
+  //#endregion
+
+  //#region State
+
+  @state() map?: Map;
+
+  @state() selectedPhotoMarkers?: PhotoMarker[];
+
+  @state() selectedPhotoMarker?: PhotoMarker;
+
+  //#endregion
+
   mapRef?: HTMLElement;
   photoMarkers: PhotoMarker[] = [];
 
   //#region Private methods
 
   async createImgMarker(
-    src: string,
+    source: Photo,
     markerSize: number,
     markerIndicatorSize: number
   ): Promise<PhotoMarker> {
@@ -51,23 +81,23 @@ export class PhotoMap extends LitElement {
       throw new Error("Map is not initialized");
     }
 
-    const response = await fetch(src);
+    const response = await fetch(source.thumbnailSrc);
     const blob = await response.blob();
     const [long, lat] = await readLongLatFromJpg(blob);
 
     // create marker element
-    const map = document.createElement("div");
+    const container = document.createElement("div");
     const countIndicator = document.createElement("div");
     countIndicator.classList.add("count-indicator");
-    map.appendChild(countIndicator);
+    container.appendChild(countIndicator);
     const img = document.createElement("img");
-    img.src = src;
+    img.src = source.thumbnailSrc;
     img.width = markerSize;
     img.height = markerSize;
-    map.appendChild(img);
+    container.appendChild(img);
 
     const marker = new Marker({
-      element: map,
+      element: container,
       anchor: "bottom",
       offset: [0, -markerIndicatorSize],
     })
@@ -75,21 +105,24 @@ export class PhotoMap extends LitElement {
       .addTo(this.map);
     marker.addClassName("photo-marker");
 
-    const photoMarker = {
-      src,
+    const photoMarker: PhotoMarker = {
+      src: source.src,
+      thumbnailSrc: source.thumbnailSrc,
       marker,
-      element: map,
+      element: container,
       countIndicator,
       hiddenPhotoMarkers: [],
     };
-    map.addEventListener("click", () => {
-      this.dispatchEvent(
-        new CustomEvent("journeyPhotoMarkerClick", {
-          detail: { photos: [photoMarker, ...photoMarker.hiddenPhotoMarkers] },
-          bubbles: true,
-          composed: true,
-        })
-      );
+    container.addEventListener("click", () => {
+      if (!photoMarker.hiddenPhotoMarkers.length) {
+        this.selectedPhotoMarker = photoMarker;
+        return;
+      }
+
+      this.selectedPhotoMarkers = [
+        photoMarker,
+        ...photoMarker.hiddenPhotoMarkers,
+      ];
     });
 
     return photoMarker;
@@ -165,9 +198,42 @@ export class PhotoMap extends LitElement {
     }
   }
 
+  private async updatePhotoMarkers(): Promise<void> {
+    if (!this.sources || !this.map) {
+      return;
+    }
+
+    const computedStyle = getComputedStyle(this);
+    const markerSize = parseInt(
+      computedStyle.getPropertyValue("--journey-map-marker-size")
+    );
+    const markerIndicatorSize = parseInt(
+      computedStyle.getPropertyValue("--journey-map-marker-indicator-size")
+    );
+
+    // TODO: use cloudinary
+    this.photoMarkers = (
+      await Promise.allSettled(
+        this.sources.map((source) =>
+          this.createImgMarker(source, markerSize, markerIndicatorSize)
+        )
+      )
+    )
+      .filter((promise) => promise.status === "fulfilled")
+      .map((promise) => promise.value);
+
+    this.hideOverlappingMarkers();
+  }
+
   //#endregion
 
   //#region Lifecycle
+
+  protected willUpdate(_changedProperties: PropertyValues<this>): void {
+    if (_changedProperties.has("sources") || _changedProperties.has("map")) {
+      this.updatePhotoMarkers();
+    }
+  }
 
   async firstUpdated(): Promise<void> {
     const mapRef = this.shadowRoot?.querySelector(".map");
@@ -183,169 +249,6 @@ export class PhotoMap extends LitElement {
       zoom: 6,
     });
     this.map.on("moveend", () => this.hideOverlappingMarkers());
-
-    const computedStyle = getComputedStyle(this);
-    const markerSize = parseInt(
-      computedStyle.getPropertyValue("--journey-map-marker-size")
-    );
-    const markerIndicatorSize = parseInt(
-      computedStyle.getPropertyValue("--journey-map-marker-indicator-size")
-    );
-
-    // TODO: use cloudinary
-    this.photoMarkers = (
-      await Promise.allSettled(
-        [
-          "IMG_3193_thumbnail.jpg",
-          "IMG_3198_thumbnail.jpg",
-          "IMG_3203_thumbnail.jpg",
-          "IMG_3227_thumbnail.jpg",
-          "IMG_3230_thumbnail.jpg",
-          "IMG_3236_thumbnail.jpg",
-          "IMG_3323_thumbnail.jpg",
-          "IMG_3335_thumbnail.jpg",
-          "IMG_3357_thumbnail.jpg",
-          "IMG_3362_thumbnail.jpg",
-          "IMG_3376_thumbnail.jpg",
-          "IMG_3383_thumbnail.jpg",
-          "IMG_3385_thumbnail.jpg",
-          "IMG_3403_thumbnail.jpg",
-          "IMG_3410_thumbnail.jpg",
-          "IMG_3412_thumbnail.jpg",
-          "IMG_3417_thumbnail.jpg",
-          "IMG_3564_thumbnail.jpg",
-          "IMG_3573_thumbnail.jpg",
-          "IMG_3620_thumbnail.jpg",
-          "IMG_3635_thumbnail.jpg",
-          "IMG_3653 2_thumbnail.jpg",
-          "IMG_3654_thumbnail.jpg",
-          "IMG_3660_thumbnail.jpg",
-          "IMG_3675 2_thumbnail.jpg",
-          "IMG_3675_thumbnail.jpg",
-          "IMG_3683_thumbnail.jpg",
-          "IMG_3736_thumbnail.jpg",
-          "IMG_3738_thumbnail.jpg",
-          "IMG_3918_thumbnail.jpg",
-          "IMG_3937_thumbnail.jpg",
-          "IMG_3941_thumbnail.jpg",
-          "IMG_3977_thumbnail.jpg",
-          "IMG_4094_thumbnail.jpg",
-          "IMG_4110_thumbnail.jpg",
-          "IMG_4165_thumbnail.jpg",
-          "IMG_4283_thumbnail.jpg",
-          "IMG_4310_thumbnail.jpg",
-          "IMG_4353_thumbnail.jpg",
-          "IMG_4360_thumbnail.jpg",
-          "IMG_4377_thumbnail.jpg",
-          "IMG_4384_thumbnail.jpg",
-          "IMG_4440_thumbnail.jpg",
-          "IMG_4476_thumbnail.jpg",
-          "IMG_4506_thumbnail.jpg",
-          "IMG_4529_thumbnail.jpg",
-          "IMG_4543_thumbnail.jpg",
-          "IMG_4548_thumbnail.jpg",
-          "IMG_4603_thumbnail.jpg",
-          "IMG_4611_thumbnail.jpg",
-          "IMG_4617_thumbnail.jpg",
-          "IMG_4643_thumbnail.jpg",
-          "IMG_4680_thumbnail.jpg",
-          "IMG_4681_thumbnail.jpg",
-          "IMG_4733_thumbnail.jpg",
-          "IMG_4741_thumbnail.jpg",
-          "IMG_4760_thumbnail.jpg",
-          "IMG_4825_thumbnail.jpg",
-          "IMG_4993_thumbnail.jpg",
-          "IMG_5004_thumbnail.jpg",
-          "IMG_5014_thumbnail.jpg",
-          "IMG_5029_thumbnail.jpg",
-          "IMG_5033_thumbnail.jpg",
-          "IMG_5062_thumbnail.jpg",
-          "IMG_5101_thumbnail.jpg",
-          "IMG_5111_thumbnail.jpg",
-          "IMG_5122_thumbnail.jpg",
-          "IMG_5169_thumbnail.jpg",
-          "IMG_5177_thumbnail.jpg",
-          "IMG_5193_thumbnail.jpg",
-          "IMG_5202_thumbnail.jpg",
-          "IMG_5237_thumbnail.jpg",
-          "IMG_5364 2_thumbnail.jpg",
-          "IMG_5403_thumbnail.jpg",
-          "IMG_5427_thumbnail.jpg",
-          "IMG_5477_thumbnail.jpg",
-          "IMG_5500_thumbnail.jpg",
-          "IMG_5516_thumbnail.jpg",
-          "IMG_5619_thumbnail.jpg",
-          "IMG_5680_thumbnail.jpg",
-          "IMG_5750_thumbnail.jpg",
-          "IMG_5751 2_thumbnail.jpg",
-          "IMG_5760_thumbnail.jpg",
-          "IMG_5768 2_thumbnail.jpg",
-          "IMG_5972_thumbnail.jpg",
-          "IMG_6025_thumbnail.jpg",
-          "IMG_6028_thumbnail.jpg",
-          "IMG_6040_thumbnail.jpg",
-          "IMG_6128_thumbnail.jpg",
-          "IMG_6155_thumbnail.jpg",
-          "IMG_6157_thumbnail.jpg",
-          "IMG_6175_thumbnail.jpg",
-          "IMG_6220_thumbnail.jpg",
-          "IMG_6251_thumbnail.jpg",
-          "IMG_6253 2_thumbnail.jpg",
-          "IMG_6259_thumbnail.jpg",
-          "IMG_6292_thumbnail.jpg",
-          "IMG_6317_thumbnail.jpg",
-          "IMG_6332_thumbnail.jpg",
-          "IMG_6349_thumbnail.jpg",
-          "IMG_6356_thumbnail.jpg",
-          "IMG_6442_thumbnail.jpg",
-          "IMG_6512_thumbnail.jpg",
-          "IMG_6655_thumbnail.jpg",
-          "IMG_6664_thumbnail.jpg",
-          "IMG_6674_thumbnail.jpg",
-          "IMG_6703_thumbnail.jpg",
-          "IMG_6709_thumbnail.jpg",
-          "IMG_6720_thumbnail.jpg",
-          "IMG_6725_thumbnail.jpg",
-          "IMG_6729_thumbnail.jpg",
-          "IMG_6756_thumbnail.jpg",
-          "IMG_6758_thumbnail.jpg",
-          "IMG_6798_thumbnail.jpg",
-          "IMG_6804_thumbnail.jpg",
-          "IMG_6805_thumbnail.jpg",
-          "IMG_6807 2_thumbnail.jpg",
-          "IMG_6824_thumbnail.jpg",
-          "IMG_6828_thumbnail.jpg",
-          "IMG_6829_thumbnail.jpg",
-          "IMG_6883_thumbnail.jpg",
-          "IMG_6962_thumbnail.jpg",
-          "IMG_7019_thumbnail.jpg",
-          "IMG_7042_thumbnail.jpg",
-          "IMG_7046_thumbnail.jpg",
-          "IMG_7150_thumbnail.jpg",
-          "IMG_7169_thumbnail.jpg",
-          "IMG_7185_thumbnail.jpg",
-          "IMG_7212_thumbnail.jpg",
-          "IMG_7300_thumbnail.jpg",
-          "IMG_7399_thumbnail.jpg",
-          "IMG_7406_thumbnail.jpg",
-          "IMG_7452_thumbnail.jpg",
-          "IMG_7468_thumbnail.jpg",
-          "IMG_7479_thumbnail.jpg",
-          "IMG_7552_thumbnail.jpg",
-          "IMG_7567_thumbnail.jpg",
-        ].map((src) =>
-          this.createImgMarker(
-            `thumbnails/${src}`,
-            markerSize,
-            markerIndicatorSize
-          )
-        )
-      )
-    )
-      .filter((promise) => promise.status === "fulfilled")
-      .map((promise) => promise.value);
-
-    this.hideOverlappingMarkers();
   }
 
   //#endregion
@@ -353,12 +256,34 @@ export class PhotoMap extends LitElement {
   //#region Rendering
 
   render(): TemplateResult {
-    return html` <div class="container">
-      <div class="map"></div>
-      <div class="content">
-        <slot> </slot>
+    return html`
+      <div class="container">
+        <div class="map"></div>
+        <div class="content">
+          <journey-photo-gallery
+            ?closed=${!this.selectedPhotoMarkers?.length}
+            @journey-closed=${() => (this.selectedPhotoMarkers = undefined)}
+          >
+            ${this.selectedPhotoMarkers?.map(
+              (marker) =>
+                html`<journey-photo-gallery-item
+                  src="${marker.thumbnailSrc}"
+                  @click=${() => (this.selectedPhotoMarker = marker)}
+                />`
+            )}
+          </journey-photo-gallery>
+        </div>
       </div>
-    </div>`;
+      <journey-scrim
+        ?closed=${!this.selectedPhotoMarker}
+        @journey-closed=${() => (this.selectedPhotoMarker = undefined)}
+      ></journey-scrim>
+      ${this.selectedPhotoMarker &&
+      html`<img
+        class="selected-photo"
+        src="${this.selectedPhotoMarker.src}"
+      />`}
+    `;
   }
 
   //#endregion

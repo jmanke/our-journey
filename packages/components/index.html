@@ -19,17 +19,17 @@
       type="module"
       src="/src/components/close-button/close-button.ts"
     ></script>
+    <script
+      type="module"
+      src="/src/components/panel/panel.ts"
+    ></script>
+    <script
+      type="module"
+      src="/src/components/scrim/scrim.ts"
+    ></script>
   </head>
   <body>
     <journey-photo-map>
-      <journey-photo-gallery closed>
-        <journey-photo-gallery-item src="thumbnails/IMG_4285_thumbnail.jpg">
-        </journey-photo-gallery-item>
-        <journey-photo-gallery-item src="thumbnails/IMG_4285_thumbnail.jpg">
-        </journey-photo-gallery-item>
-        <journey-photo-gallery-item src="thumbnails/IMG_4285_thumbnail.jpg">
-        </journey-photo-gallery-item>
-      </journey-photo-gallery>
     </journey-photo-map>
   </body>
 
@@ -37,18 +37,145 @@
     document.addEventListener("DOMContentLoaded", () => {
       const photoGallery = document.querySelector("journey-photo-gallery");
       const photoMap = document.querySelector("journey-photo-map");
-      photoMap?.addEventListener("journeyPhotoMarkerClick", (event) => {
-        photoGallery.closed = false;
-        while (photoGallery.firstElementChild) {
-          photoGallery.firstElementChild.remove();
-        }
-        console.log(event.detail.photos);
-        event.detail.photos.forEach(photo => {
-          const item = document.createElement("journey-photo-gallery-item");
-          item.src = photo.src;
-          photoGallery.appendChild(item);
-        });
-      });
+      photoMap.sources = [
+        { src: "photos/IMG_3193.jpg", thumbnailSrc: "thumbnails/IMG_3193_thumbnail.jpg" },
+        { src: "photos/IMG_3198.jpg", thumbnailSrc: "thumbnails/IMG_3198_thumbnail.jpg" },
+        { src: "photos/IMG_3203.jpg", thumbnailSrc: "thumbnails/IMG_3203_thumbnail.jpg" },
+        { src: "photos/IMG_3227.jpg", thumbnailSrc: "thumbnails/IMG_3227_thumbnail.jpg" },
+        { src: "photos/IMG_3230.jpg", thumbnailSrc: "thumbnails/IMG_3230_thumbnail.jpg" },
+        { src: "photos/IMG_3236.jpg", thumbnailSrc: "thumbnails/IMG_3236_thumbnail.jpg" },
+        { src: "photos/IMG_3323.jpg", thumbnailSrc: "thumbnails/IMG_3323_thumbnail.jpg" },
+        { src: "photos/IMG_3335.jpg", thumbnailSrc: "thumbnails/IMG_3335_thumbnail.jpg" },
+        { src: "photos/IMG_3357.jpg", thumbnailSrc: "thumbnails/IMG_3357_thumbnail.jpg" },
+        { src: "photos/IMG_3362.jpg", thumbnailSrc: "thumbnails/IMG_3362_thumbnail.jpg" },
+        { src: "photos/IMG_3376.jpg", thumbnailSrc: "thumbnails/IMG_3376_thumbnail.jpg" },
+        { src: "photos/IMG_3383.jpg", thumbnailSrc: "thumbnails/IMG_3383_thumbnail.jpg" },
+        { src: "photos/IMG_3385.jpg", thumbnailSrc: "thumbnails/IMG_3385_thumbnail.jpg" },
+        { src: "photos/IMG_3403.jpg", thumbnailSrc: "thumbnails/IMG_3403_thumbnail.jpg" },
+        { src: "photos/IMG_3410.jpg", thumbnailSrc: "thumbnails/IMG_3410_thumbnail.jpg" },
+        { src: "photos/IMG_3412.jpg", thumbnailSrc: "thumbnails/IMG_3412_thumbnail.jpg" },
+        { src: "photos/IMG_3417.jpg", thumbnailSrc: "thumbnails/IMG_3417_thumbnail.jpg" },
+        { src: "photos/IMG_3564.jpg", thumbnailSrc: "thumbnails/IMG_3564_thumbnail.jpg" },
+        { src: "photos/IMG_3573.jpg", thumbnailSrc: "thumbnails/IMG_3573_thumbnail.jpg" },
+        { src: "photos/IMG_3620.jpg", thumbnailSrc: "thumbnails/IMG_3620_thumbnail.jpg" },
+        { src: "photos/IMG_3635.jpg", thumbnailSrc: "thumbnails/IMG_3635_thumbnail.jpg" },
+        { src: "photos/IMG_3653 2.jpg", thumbnailSrc: "thumbnails/IMG_3653 2_thumbnail.jpg" },
+        { src: "photos/IMG_3654.jpg", thumbnailSrc: "thumbnails/IMG_3654_thumbnail.jpg" },
+        { src: "photos/IMG_3660.jpg", thumbnailSrc: "thumbnails/IMG_3660_thumbnail.jpg" },
+        { src: "photos/IMG_3675 2.jpg", thumbnailSrc: "thumbnails/IMG_3675 2_thumbnail.jpg" },
+        { src: "photos/IMG_3675.jpg", thumbnailSrc: "thumbnails/IMG_3675_thumbnail.jpg" },
+        { src: "photos/IMG_3683.jpg", thumbnailSrc: "thumbnails/IMG_3683_thumbnail.jpg" },
+        { src: "photos/IMG_3736.jpg", thumbnailSrc: "thumbnails/IMG_3736_thumbnail.jpg" },
+        { src: "photos/IMG_3738.jpg", thumbnailSrc: "thumbnails/IMG_3738_thumbnail.jpg" },
+        { src: "photos/IMG_3918.jpg", thumbnailSrc: "thumbnails/IMG_3918_thumbnail.jpg" },
+        { src: "photos/IMG_3937.jpg", thumbnailSrc: "thumbnails/IMG_3937_thumbnail.jpg" },
+        { src: "photos/IMG_3941.jpg", thumbnailSrc: "thumbnails/IMG_3941_thumbnail.jpg" },
+        { src: "photos/IMG_3977.jpg", thumbnailSrc: "thumbnails/IMG_3977_thumbnail.jpg" },
+        { src: "photos/IMG_4094.jpg", thumbnailSrc: "thumbnails/IMG_4094_thumbnail.jpg" },
+        { src: "photos/IMG_4110.jpg", thumbnailSrc: "thumbnails/IMG_4110_thumbnail.jpg" },
+        { src: "photos/IMG_4165.jpg", thumbnailSrc: "thumbnails/IMG_4165_thumbnail.jpg" },
+        { src: "photos/IMG_4283.jpg", thumbnailSrc: "thumbnails/IMG_4283_thumbnail.jpg" },
+        { src: "photos/IMG_4310.jpg", thumbnailSrc: "thumbnails/IMG_4310_thumbnail.jpg" },
+        { src: "photos/IMG_4353.jpg", thumbnailSrc: "thumbnails/IMG_4353_thumbnail.jpg" },
+        { src: "photos/IMG_4360.jpg", thumbnailSrc: "thumbnails/IMG_4360_thumbnail.jpg" },
+        { src: "photos/IMG_4377.jpg", thumbnailSrc: "thumbnails/IMG_4377_thumbnail.jpg" },
+        { src: "photos/IMG_4384.jpg", thumbnailSrc: "thumbnails/IMG_4384_thumbnail.jpg" },
+        { src: "photos/IMG_4440.jpg", thumbnailSrc: "thumbnails/IMG_4440_thumbnail.jpg" },
+        { src: "photos/IMG_4476.jpg", thumbnailSrc: "thumbnails/IMG_4476_thumbnail.jpg" },
+        { src: "photos/IMG_4506.jpg", thumbnailSrc: "thumbnails/IMG_4506_thumbnail.jpg" },
+        { src: "photos/IMG_4529.jpg", thumbnailSrc: "thumbnails/IMG_4529_thumbnail.jpg" },
+        { src: "photos/IMG_4543.jpg", thumbnailSrc: "thumbnails/IMG_4543_thumbnail.jpg" },
+        { src: "photos/IMG_4548.jpg", thumbnailSrc: "thumbnails/IMG_4548_thumbnail.jpg" },
+        { src: "photos/IMG_4603.jpg", thumbnailSrc: "thumbnails/IMG_4603_thumbnail.jpg" },
+        { src: "photos/IMG_4611.jpg", thumbnailSrc: "thumbnails/IMG_4611_thumbnail.jpg" },
+        { src: "photos/IMG_4617.jpg", thumbnailSrc: "thumbnails/IMG_4617_thumbnail.jpg" },
+        { src: "photos/IMG_4643.jpg", thumbnailSrc: "thumbnails/IMG_4643_thumbnail.jpg" },
+        { src: "photos/IMG_4680.jpg", thumbnailSrc: "thumbnails/IMG_4680_thumbnail.jpg" },
+        { src: "photos/IMG_4681.jpg", thumbnailSrc: "thumbnails/IMG_4681_thumbnail.jpg" },
+        { src: "photos/IMG_4733.jpg", thumbnailSrc: "thumbnails/IMG_4733_thumbnail.jpg" },
+        { src: "photos/IMG_4741.jpg", thumbnailSrc: "thumbnails/IMG_4741_thumbnail.jpg" },
+        { src: "photos/IMG_4760.jpg", thumbnailSrc: "thumbnails/IMG_4760_thumbnail.jpg" },
+        { src: "photos/IMG_4825.jpg", thumbnailSrc: "thumbnails/IMG_4825_thumbnail.jpg" },
+        { src: "photos/IMG_4993.jpg", thumbnailSrc: "thumbnails/IMG_4993_thumbnail.jpg" },
+        { src: "photos/IMG_5004.jpg", thumbnailSrc: "thumbnails/IMG_5004_thumbnail.jpg" },
+        { src: "photos/IMG_5014.jpg", thumbnailSrc: "thumbnails/IMG_5014_thumbnail.jpg" },
+        { src: "photos/IMG_5029.jpg", thumbnailSrc: "thumbnails/IMG_5029_thumbnail.jpg" },
+        { src: "photos/IMG_5033.jpg", thumbnailSrc: "thumbnails/IMG_5033_thumbnail.jpg" },
+        { src: "photos/IMG_5062.jpg", thumbnailSrc: "thumbnails/IMG_5062_thumbnail.jpg" },
+        { src: "photos/IMG_5101.jpg", thumbnailSrc: "thumbnails/IMG_5101_thumbnail.jpg" },
+        { src: "photos/IMG_5111.jpg", thumbnailSrc: "thumbnails/IMG_5111_thumbnail.jpg" },
+        { src: "photos/IMG_5122.jpg", thumbnailSrc: "thumbnails/IMG_5122_thumbnail.jpg" },
+        { src: "photos/IMG_5169.jpg", thumbnailSrc: "thumbnails/IMG_5169_thumbnail.jpg" },
+        { src: "photos/IMG_5177.jpg", thumbnailSrc: "thumbnails/IMG_5177_thumbnail.jpg" },
+        { src: "photos/IMG_5193.jpg", thumbnailSrc: "thumbnails/IMG_5193_thumbnail.jpg" },
+        { src: "photos/IMG_5202.jpg", thumbnailSrc: "thumbnails/IMG_5202_thumbnail.jpg" },
+        { src: "photos/IMG_5237.jpg", thumbnailSrc: "thumbnails/IMG_5237_thumbnail.jpg" },
+        { src: "photos/IMG_5364 2.jpg", thumbnailSrc: "thumbnails/IMG_5364 2_thumbnail.jpg" },
+        { src: "photos/IMG_5403.jpg", thumbnailSrc: "thumbnails/IMG_5403_thumbnail.jpg" },
+        { src: "photos/IMG_5427.jpg", thumbnailSrc: "thumbnails/IMG_5427_thumbnail.jpg" },
+        { src: "photos/IMG_5477.jpg", thumbnailSrc: "thumbnails/IMG_5477_thumbnail.jpg" },
+        { src: "photos/IMG_5500.jpg", thumbnailSrc: "thumbnails/IMG_5500_thumbnail.jpg" },
+        { src: "photos/IMG_5516.jpg", thumbnailSrc: "thumbnails/IMG_5516_thumbnail.jpg" },
+        { src: "photos/IMG_5619.jpg", thumbnailSrc: "thumbnails/IMG_5619_thumbnail.jpg" },
+        { src: "photos/IMG_5680.jpg", thumbnailSrc: "thumbnails/IMG_5680_thumbnail.jpg" },
+        { src: "photos/IMG_5750.jpg", thumbnailSrc: "thumbnails/IMG_5750_thumbnail.jpg" },
+        { src: "photos/IMG_5751 2.jpg", thumbnailSrc: "thumbnails/IMG_5751 2_thumbnail.jpg" },
+        { src: "photos/IMG_5760.jpg", thumbnailSrc: "thumbnails/IMG_5760_thumbnail.jpg" },
+        { src: "photos/IMG_5768 2.jpg", thumbnailSrc: "thumbnails/IMG_5768 2_thumbnail.jpg" },
+        { src: "photos/IMG_5972.jpg", thumbnailSrc: "thumbnails/IMG_5972_thumbnail.jpg" },
+        { src: "photos/IMG_6025.jpg", thumbnailSrc: "thumbnails/IMG_6025_thumbnail.jpg" },
+        { src: "photos/IMG_6028.jpg", thumbnailSrc: "thumbnails/IMG_6028_thumbnail.jpg" },
+        { src: "photos/IMG_6040.jpg", thumbnailSrc: "thumbnails/IMG_6040_thumbnail.jpg" },
+        { src: "photos/IMG_6128.jpg", thumbnailSrc: "thumbnails/IMG_6128_thumbnail.jpg" },
+        { src: "photos/IMG_6155.jpg", thumbnailSrc: "thumbnails/IMG_6155_thumbnail.jpg" },
+        { src: "photos/IMG_6157.jpg", thumbnailSrc: "thumbnails/IMG_6157_thumbnail.jpg" },
+        { src: "photos/IMG_6175.jpg", thumbnailSrc: "thumbnails/IMG_6175_thumbnail.jpg" },
+        { src: "photos/IMG_6220.jpg", thumbnailSrc: "thumbnails/IMG_6220_thumbnail.jpg" },
+        { src: "photos/IMG_6251.jpg", thumbnailSrc: "thumbnails/IMG_6251_thumbnail.jpg" },
+        { src: "photos/IMG_6253 2.jpg", thumbnailSrc: "thumbnails/IMG_6253 2_thumbnail.jpg" },
+        { src: "photos/IMG_6259.jpg", thumbnailSrc: "thumbnails/IMG_6259_thumbnail.jpg" },
+        { src: "photos/IMG_6292.jpg", thumbnailSrc: "thumbnails/IMG_6292_thumbnail.jpg" },
+        { src: "photos/IMG_6317.jpg", thumbnailSrc: "thumbnails/IMG_6317_thumbnail.jpg" },
+        { src: "photos/IMG_6332.jpg", thumbnailSrc: "thumbnails/IMG_6332_thumbnail.jpg" },
+        { src: "photos/IMG_6349.jpg", thumbnailSrc: "thumbnails/IMG_6349_thumbnail.jpg" },
+        { src: "photos/IMG_6356.jpg", thumbnailSrc: "thumbnails/IMG_6356_thumbnail.jpg" },
+        { src: "photos/IMG_6442.jpg", thumbnailSrc: "thumbnails/IMG_6442_thumbnail.jpg" },
+        { src: "photos/IMG_6512.jpg", thumbnailSrc: "thumbnails/IMG_6512_thumbnail.jpg" },
+        { src: "photos/IMG_6655.jpg", thumbnailSrc: "thumbnails/IMG_6655_thumbnail.jpg" },
+        { src: "photos/IMG_6664.jpg", thumbnailSrc: "thumbnails/IMG_6664_thumbnail.jpg" },
+        { src: "photos/IMG_6674.jpg", thumbnailSrc: "thumbnails/IMG_6674_thumbnail.jpg" },
+        { src: "photos/IMG_6703.jpg", thumbnailSrc: "thumbnails/IMG_6703_thumbnail.jpg" },
+        { src: "photos/IMG_6709.jpg", thumbnailSrc: "thumbnails/IMG_6709_thumbnail.jpg" },
+        { src: "photos/IMG_6720.jpg", thumbnailSrc: "thumbnails/IMG_6720_thumbnail.jpg" },
+        { src: "photos/IMG_6725.jpg", thumbnailSrc: "thumbnails/IMG_6725_thumbnail.jpg" },
+        { src: "photos/IMG_6729.jpg", thumbnailSrc: "thumbnails/IMG_6729_thumbnail.jpg" },
+        { src: "photos/IMG_6756.jpg", thumbnailSrc: "thumbnails/IMG_6756_thumbnail.jpg" },
+        { src: "photos/IMG_6758.jpg", thumbnailSrc: "thumbnails/IMG_6758_thumbnail.jpg" },
+        { src: "photos/IMG_6798.jpg", thumbnailSrc: "thumbnails/IMG_6798_thumbnail.jpg" },
+        { src: "photos/IMG_6804.jpg", thumbnailSrc: "thumbnails/IMG_6804_thumbnail.jpg" },
+        { src: "photos/IMG_6805.jpg", thumbnailSrc: "thumbnails/IMG_6805_thumbnail.jpg" },
+        { src: "photos/IMG_6807 2.jpg", thumbnailSrc: "thumbnails/IMG_6807 2_thumbnail.jpg" },
+        { src: "photos/IMG_6824.jpg", thumbnailSrc: "thumbnails/IMG_6824_thumbnail.jpg" },
+        { src: "photos/IMG_6828.jpg", thumbnailSrc: "thumbnails/IMG_6828_thumbnail.jpg" },
+        { src: "photos/IMG_6829.jpg", thumbnailSrc: "thumbnails/IMG_6829_thumbnail.jpg" },
+        { src: "photos/IMG_6883.jpg", thumbnailSrc: "thumbnails/IMG_6883_thumbnail.jpg" },
+        { src: "photos/IMG_6962.jpg", thumbnailSrc: "thumbnails/IMG_6962_thumbnail.jpg" },
+        { src: "photos/IMG_7019.jpg", thumbnailSrc: "thumbnails/IMG_7019_thumbnail.jpg" },
+        { src: "photos/IMG_7042.jpg", thumbnailSrc: "thumbnails/IMG_7042_thumbnail.jpg" },
+        { src: "photos/IMG_7046.jpg", thumbnailSrc: "thumbnails/IMG_7046_thumbnail.jpg" },
+        { src: "photos/IMG_7150.jpg", thumbnailSrc: "thumbnails/IMG_7150_thumbnail.jpg" },
+        { src: "photos/IMG_7169.jpg", thumbnailSrc: "thumbnails/IMG_7169_thumbnail.jpg" },
+        { src: "photos/IMG_7185.jpg", thumbnailSrc: "thumbnails/IMG_7185_thumbnail.jpg" },
+        { src: "photos/IMG_7212.jpg", thumbnailSrc: "thumbnails/IMG_7212_thumbnail.jpg" },
+        { src: "photos/IMG_7300.jpg", thumbnailSrc: "thumbnails/IMG_7300_thumbnail.jpg" },
+        { src: "photos/IMG_7399.jpg", thumbnailSrc: "thumbnails/IMG_7399_thumbnail.jpg" },
+        { src: "photos/IMG_7406.jpg", thumbnailSrc: "thumbnails/IMG_7406_thumbnail.jpg" },
+        { src: "photos/IMG_7452.jpg", thumbnailSrc: "thumbnails/IMG_7452_thumbnail.jpg" },
+        { src: "photos/IMG_7468.jpg", thumbnailSrc: "thumbnails/IMG_7468_thumbnail.jpg" },
+        { src: "photos/IMG_7479.jpg", thumbnailSrc: "thumbnails/IMG_7479_thumbnail.jpg" },
+        { src: "photos/IMG_7552.jpg", thumbnailSrc: "thumbnails/IMG_7552_thumbnail.jpg" },
+        { src: "photos/IMG_7567.jpg", thumbnailSrc: "thumbnails/IMG_7567_thumbnail.jpg" },
+      ];
     });
   </script>
 </body>

@@ -1,9 +1,9 @@
 import { LitElement, html, unsafeCSS, type TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import styles from "./photo-gallery.css?inline";
+import styles from "./panel.css?inline";
 
-@customElement("journey-photo-gallery")
-export class PhotoGallery extends LitElement {
+@customElement("journey-panel")
+export class Panel extends LitElement {
   static styles = [unsafeCSS(styles)];
 
   //#region Properties
@@ -18,10 +18,10 @@ export class PhotoGallery extends LitElement {
 
   //#region Private methods
 
-  private close(): void {
+  closePanel(): void {
     this.closed = true;
     this.dispatchEvent(
-      new CustomEvent("journey-closed", {
+      new CustomEvent("journey-panel-closed", {
         bubbles: true,
         composed: true,
       })
@@ -37,16 +37,12 @@ export class PhotoGallery extends LitElement {
   //#region Rendering
 
   render(): TemplateResult {
-    return html`
-      <journey-panel
-        .closed=${this.closed}
-        @journey-panel-closed=${() => this.close()}
-      >
-        <div class="photo-gallery">
-          <slot></slot>
-        </div>
-      </journey-panel>
-    `;
+    return html`<div class="panel">
+      <journey-close-button
+        @click=${() => this.closePanel()}
+      ></journey-close-button>
+      <slot></slot>
+    </div>`;
   }
 
   //#endregion
