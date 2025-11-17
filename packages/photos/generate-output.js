@@ -3,6 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const exifr = require("exifr");
 
+const assetsPath = path.join(__dirname, "../../assets");
+
 async function cropCenterSquare(inputPath, outputPath, size = 200) {
   const image = sharp(inputPath);
   const metadata = await image.metadata();
@@ -24,10 +26,9 @@ if (fs.existsSync("./output") === false) {
 }
 
 async function deleteImagesWithoutGPS() {
-  const imagesDir = path.join(__dirname, "images");
-  const files = fs.readdirSync(imagesDir);
+  const files = fs.readdirSync(path.join(assetsPath, "photos"));
   for (const file of files) {
-    const filePath = path.join(imagesDir, file);
+    const filePath = path.join(assetsPath, "photos", file);
     try {
       const exif = await exifr.gps(filePath);
       if (!exif || exif.latitude == null || exif.longitude == null) {
@@ -46,17 +47,16 @@ async function processImagesAndWriteList() {
   await deleteImagesWithoutGPS();
 
   const outputData = [];
-  const files = fs.readdirSync("./images");
+  const files = fs.readdirSync(path.join(assetsPath, "photos"));
   for (const file of files) {
-    const inputPath = `./images/${file}`;
+    const inputPath = path.join(assetsPath, "photos", file);
     try {
       const exif = await exifr.gps(inputPath);
       console.log(`${file}: has GPS (${exif.latitude}, ${exif.longitude})`);
-      const outputFileName = path.parse(file).name;
-      const extension = path.parse(file).ext;
-      const outputPath = `./output/${outputFileName}_thumbnail${extension}`;
+      const outputPath = path.join(assetsPath, "thumbnails", file);
       outputData.push({
-        src: file,
+        src: `photos/${file}`,
+        thumbnailSrc: `thumbnails/${file}`,
         longLat: [exif.longitude, exif.latitude],
       });
       await cropCenterSquare(inputPath, outputPath, 250);
@@ -66,12 +66,8 @@ async function processImagesAndWriteList() {
   }
   // Write the output file names to a JSON file
   const jsonArray = JSON.stringify(outputData, null, 2);
-  fs.writeFileSync("./output/photo-long-lat.json", jsonArray);
-  console.log(
-    "Wrote ./output/photo-long-lat.json with",
-    outputData.length,
-    "entries"
-  );
+  fs.writeFileSync(path.join(assetsPath, "photo-data.json"), jsonArray);
+  console.log("Wrote photo-data.json with", outputData.length, "entries");
 }
 
 processImagesAndWriteList();
