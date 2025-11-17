@@ -4,6 +4,8 @@ const path = require("path");
 const exifr = require("exifr");
 
 const assetsPath = path.join(__dirname, "../../assets");
+const baseUrl =
+  "https://media.githubusercontent.com/media/jmanke/our-journey/refs/heads/main/assets";
 
 async function cropCenterSquare(inputPath, outputPath, size = 200) {
   const image = sharp(inputPath);
@@ -55,8 +57,8 @@ async function processImagesAndWriteList() {
       console.log(`${file}: has GPS (${exif.latitude}, ${exif.longitude})`);
       const outputPath = path.join(assetsPath, "thumbnails", file);
       outputData.push({
-        src: `photos/${file}`,
-        thumbnailSrc: `thumbnails/${file}`,
+        src: `${baseUrl}/photos/${file}`,
+        thumbnailSrc: `${baseUrl}/thumbnails/${file}`,
         longLat: [exif.longitude, exif.latitude],
       });
       await cropCenterSquare(inputPath, outputPath, 250);
