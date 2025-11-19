@@ -5,7 +5,7 @@ const exifr = require("exifr");
 
 const imagesPath = path.join(__dirname, "./images");
 const outputPath = path.join(__dirname, "./output");
-const baseUrl = "https://pub-5f5799b2c98f463282f3ff2882f2e34f.r2.dev";
+const baseUrl = "https://soft-cake-52a8.jeffman879.workers.dev";
 
 async function cropCenterSquare(inputPath, outputPath, size = 200) {
   const image = sharp(inputPath);
